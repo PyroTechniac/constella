@@ -1,0 +1,39 @@
+[package]
+name = "constella-types"
+version = "0.1.0"
+edition = "2018"
+authors = ["Gryffon Bellish <owenbellish@gmail.com>"]
+
+[dependencies]
+byteorder = "1.4.3"
+
+[dependencies.bincode]
+version = "1.2.1"
+optional = true
+
+[dependencies.bytemuck]
+version = "1.5.0"
+features = ["extern_crate_alloc", "extern_crate_std"]
+
+[dependencies.constella-traits]
+path = "../constella-traits"
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.serde_json]
+version = "1"
+optional = true
+
+[dev-dependencies]
+rand = "0.8"
+
+[features]
+default = ["bincode", "json"]
+json = ["serde_json"]
+
+preserve_order = ["serde_json/preserve_order"]
+arbitrary_precision = ["serde_json/arbitrary_precision"]
+raw_value = ["serde_json/raw_value"]
+unbounded_depth = ["serde_json/unbounded_depth"]
