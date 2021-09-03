@@ -2,6 +2,28 @@ use bytemuck::{bytes_of, bytes_of_mut, try_from_bytes, Pod, PodCastError};
 use constella_traits::{BytesDecode, BytesEncode};
 use std::{borrow::Cow, error::Error, marker::PhantomData};
 
+
+/// Describes a type that must be [memory aligned] and
+/// will be reallocated if it is not.
+///
+/// A [`Cow`] type is returned to represent this behavior.
+///
+/// If you need to store a type that doesn't depends on any
+/// memory alignment it is recommended to use the [`UnalignedType`].
+///
+/// If you don't want to be bored with the [`Cow`] type you can
+/// use the [`OwnedType`].
+///
+/// To store slices, you must look at the [`CowSlice`],
+/// [`OwnedSlice`] or [`UnalignedSlice`] types.
+///
+/// [memory aligned]: std::mem::align_of()
+/// [`Cow`]: std::borrow::Cow
+/// [`UnalignedType`]: crate::UnalignedType
+/// [`OwnedType`]: crate::OwnedType
+/// [`UnalignedSlice`]: crate::UnalignedSlice
+/// [`OwnedSlice`]: crate::OwnedSlice
+/// [`CowSlice`]: crate::CowSlice
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CowType<T>(PhantomData<T>);
 

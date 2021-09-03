@@ -5,6 +5,21 @@ use std::{
 use bytemuck::{Pod, PodCastError, try_cast_slice, pod_collect_to_vec};
 use constella_traits::{BytesDecode, BytesEncode};
 
+/// Describes a slice that must be [memory aligned] and
+/// will be reallocated if it is not.
+///
+/// A [`Cow`] type is returned to represent this behavior.
+///
+/// If you need to store a slice that doesn't depends on any
+/// memory alignment it is recommended to use the [`UnalignedSlice`].
+///
+/// if you don't want to be bored with the [`Cow`] type you can
+/// use the [`OwnedSlice`].
+///
+/// [memory aligned]: std::mem::align_of()
+/// [`Cow`]: std::borrow::Cow
+/// [`UnalignedSlice`]: crate::UnalignedSlice
+/// [`OwnedSlice`]: crate::OwnedSlice
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CowSlice<'a, T>(PhantomData<&'a T>);
