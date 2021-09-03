@@ -2,6 +2,10 @@ use constella_traits::{BytesDecode, BytesEncode};
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, error::Error, marker::PhantomData};
 
+
+/// Describes a type that is [`Serialize`]/[`Deserialize`] and uses `bincode` to do so.
+///
+/// It can borrow bytes from the original slice.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Bincode<T>(PhantomData<T>);
 
