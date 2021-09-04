@@ -1,7 +1,6 @@
-use std::{borrow::Cow, error::Error, marker::PhantomData};
-use bytemuck::{Pod, bytes_of, try_from_bytes};
+use bytemuck::{bytes_of, try_from_bytes, Pod};
 use constella_traits::{BytesDecode, BytesEncode};
-
+use std::{borrow::Cow, error::Error, marker::PhantomData};
 
 /// Describes a type that is totally borrowed and doesn't
 /// depends on any [memory alignment].
@@ -21,19 +20,19 @@ use constella_traits::{BytesDecode, BytesEncode};
 pub struct UnalignedType<T>(PhantomData<T>);
 
 impl<T: Pod> BytesEncode for UnalignedType<T> {
-    type Item = T;
+	type Item = T;
 
-    fn bytes_encode(item: &Self::Item) -> Result<Cow<[u8]>, Box<dyn Error + Send + Sync>> {
-        Ok(Cow::Borrowed(bytes_of(item)))
-    }
+	fn bytes_encode(item: &Self::Item) -> Result<Cow<[u8]>, Box<dyn Error + Send + Sync>> {
+		Ok(Cow::Borrowed(bytes_of(item)))
+	}
 }
 
 impl<'a, T: Pod> BytesDecode<'a> for UnalignedType<T> {
-    type Item = &'a T;
+	type Item = &'a T;
 
-    fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
-        try_from_bytes(bytes).map_err(Into::into)
-    }
+	fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
+		try_from_bytes(bytes).map_err(Into::into)
+	}
 }
 
 unsafe impl<T> Send for UnalignedType<T> {}

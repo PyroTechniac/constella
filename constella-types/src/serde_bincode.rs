@@ -2,7 +2,6 @@ use constella_traits::{BytesDecode, BytesEncode};
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, error::Error, marker::PhantomData};
 
-
 /// Describes a type that is [`Serialize`]/[`Deserialize`] and uses `bincode` to do so.
 ///
 /// It can borrow bytes from the original slice.
@@ -21,12 +20,15 @@ where
 	}
 }
 
-impl<'a, T: 'a> BytesDecode<'a> for Bincode<T> where T: Deserialize<'a> {
-    type Item = T;
+impl<'a, T: 'a> BytesDecode<'a> for Bincode<T>
+where
+	T: Deserialize<'a>,
+{
+	type Item = T;
 
-    fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
-        bincode::deserialize(bytes).map_err(Into::into)
-    }
+	fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
+		bincode::deserialize(bytes).map_err(Into::into)
+	}
 }
 
 unsafe impl<T> Send for Bincode<T> {}

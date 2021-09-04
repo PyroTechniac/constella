@@ -1,8 +1,7 @@
-use std::{borrow::Cow, error::Error, marker::PhantomData};
-use constella_traits::{BytesDecode, BytesEncode};
-use bytemuck::Pod;
 use crate::CowType;
-
+use bytemuck::Pod;
+use constella_traits::{BytesDecode, BytesEncode};
+use std::{borrow::Cow, error::Error, marker::PhantomData};
 
 /// Describes a type that is totally owned (doesn't
 /// hold any reference to the original slice).
@@ -27,19 +26,19 @@ use crate::CowType;
 pub struct OwnedType<T>(PhantomData<T>);
 
 impl<T: Pod> BytesEncode for OwnedType<T> {
-    type Item = T;
+	type Item = T;
 
-    fn bytes_encode(item: &Self::Item) -> Result<Cow<[u8]>, Box<dyn Error + Send + Sync>> {
-        CowType::bytes_encode(item)
-    }
+	fn bytes_encode(item: &Self::Item) -> Result<Cow<[u8]>, Box<dyn Error + Send + Sync>> {
+		CowType::bytes_encode(item)
+	}
 }
 
 impl<'a, T: Pod> BytesDecode<'a> for OwnedType<T> {
-    type Item = T;
+	type Item = T;
 
-    fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
-        CowType::<T>::bytes_decode(bytes).map(Cow::into_owned)
-    }
+	fn bytes_decode(bytes: &'a [u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
+		CowType::<T>::bytes_decode(bytes).map(Cow::into_owned)
+	}
 }
 
 unsafe impl<T> Send for OwnedType<T> {}

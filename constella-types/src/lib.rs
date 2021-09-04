@@ -1,6 +1,5 @@
 #![feature(doc_cfg)]
 
-
 //! Types that can be used to serialize and deserialize types inside databases.
 //!
 //! How to choose the right type to store things in this database?
@@ -43,7 +42,7 @@ mod serde_json;
 
 pub use self::{
 	cow_slice::CowSlice, cow_type::CowType, owned_slice::OwnedSlice, owned_type::OwnedType,
-	str::Str, unaligned_slice::UnalignedSlice, unaligned_type::UnalignedType, unit::Unit
+	str::Str, unaligned_slice::UnalignedSlice, unaligned_type::UnalignedType, unit::Unit,
 };
 
 #[cfg(feature = "bincode")]
