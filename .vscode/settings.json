@@ -1,5 +1,5 @@
 {
-    "rust-analyzer.cargo.allFeatures": true,
+    "rust-analyzer.cargo.allFeatures": false,
     "rust-analyzer.updates.channel": "stable",
     "rust-analyzer.procMacro.enable": false,
     "rust-analyzer.diagnostics.disabled": [

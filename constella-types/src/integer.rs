@@ -52,7 +52,7 @@ making it useful for parsing and serialization.
 
 		unsafe impl<O: ByteOrder> Zeroable for $name<O> {
 			fn zeroed() -> $name<O> {
-				$name([0u8; $bytes], PhantomData)
+				$name([0; $bytes], PhantomData)
 			}
 		}
 
@@ -64,6 +64,7 @@ making it useful for parsing and serialization.
 
 			/// Constructs a new value, possibly performing an endianness swap
 			/// to guarantee that the returned value has endianness `O`.
+			#[must_use]
 			pub fn new(n: $native) -> $name<O> {
 				let mut out = $name::default();
 				O::$write_method(&mut out.0[..], n);
@@ -73,6 +74,7 @@ making it useful for parsing and serialization.
 			/// Returns the value as a primitive type, possibly performing an
 			/// endianness swap to guarantee that the return value has the
 			/// endianness of the native platform.
+			#[must_use]
 			pub fn get(self) -> $native {
 				O::$read_method(&self.0[..])
 			}

@@ -1,16 +1,34 @@
+#![feature(once_cell)]
+#![deny(clippy::all)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::suspicious)]
+#![allow(
+	clippy::module_name_repetitions,
+	clippy::missing_safety_doc,
+	clippy::missing_panics_doc,
+	clippy::missing_errors_doc
+)]
+
+#[cfg(all(
+	feature = "lmdb",
+	feature = "mdbx",
+	not(any(feature = "lmdb", feature = "mdbx"))
+))]
+compile_error!("Either lmdb or mdbx needs to be enabled, but not both");
+
+mod env;
 mod mdb;
 
 pub use bytemuck;
 pub use byteorder;
 pub use constella_types as types;
 
-pub use self::mdb::error::Error as MdbError;
+pub use self::{
+	env::{env_closing_event, Env, EnvClosingEvent, EnvOpenOptions},
+	mdb::{error::Error as MdbError, flags},
+};
 
 use constella_traits as traits;
-use std::{
-	error::{self, Error as StdError},
-	fmt, io, result,
-};
+use std::{error::Error as StdError, fmt, io, result};
 
 #[derive(Debug)]
 pub enum Error {
@@ -48,18 +66,18 @@ impl fmt::Display for Error {
 impl StdError for Error {}
 
 impl From<MdbError> for Error {
-    fn from(error: MdbError) -> Self {
-        match error {
-            MdbError::Other(e) => Self::Io(io::Error::from_raw_os_error(e)),
-            _ => Self::Mdb(error)
-        }
-    }
+	fn from(error: MdbError) -> Self {
+		match error {
+			MdbError::Other(e) => Self::Io(io::Error::from_raw_os_error(e)),
+			_ => Self::Mdb(error),
+		}
+	}
 }
 
 impl From<io::Error> for Error {
-    fn from(error: io::Error) -> Self {
-        Error::Io(error)
-    }
+	fn from(error: io::Error) -> Self {
+		Self::Io(error)
+	}
 }
 
 pub type Result<T> = result::Result<T, Error>;

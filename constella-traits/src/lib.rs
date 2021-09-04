@@ -1,3 +1,7 @@
+#![deny(clippy::all)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::suspicious)]
+#![allow(clippy::missing_errors_doc)]
+
 use std::{borrow::Cow, error::Error};
 
 /// Trait marker for encoding bytes

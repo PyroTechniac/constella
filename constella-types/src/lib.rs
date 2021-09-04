@@ -1,4 +1,6 @@
 #![feature(doc_cfg)]
+#![deny(clippy::all)]
+#![warn(clippy::pedantic, clippy::nursery, clippy::suspicious)]
 
 //! Types that can be used to serialize and deserialize types inside databases.
 //!

@@ -92,7 +92,7 @@ impl Error {
 	}
 
 	/// Converts a raw error code to an `Error`.
-	pub fn from_err_code(err_code: c_int) -> Error {
+	pub fn from_error_code(err_code: c_int) -> Error {
 		match err_code {
 			ffi::MDBX_KEYEXIST => Error::KeyExist,
 			ffi::MDBX_NOTFOUND => Error::NotFound,
@@ -128,7 +128,7 @@ impl Error {
 
 	/// Converts an `Error` to the raw error code.
 	#[allow(clippy::trivially_copy_pass_by_ref)]
-	pub fn to_err_code(&self) -> c_int {
+	pub fn to_error_code(&self) -> c_int {
 		match *self {
 			Error::KeyExist => ffi::MDBX_KEYEXIST,
 			Error::NotFound => ffi::MDBX_NOTFOUND,
@@ -166,7 +166,7 @@ impl Error {
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let description = unsafe {
-			let err: *const c_char = ffi::mdbx_strerror(self.to_err_code()) as *const c_char;
+			let err: *const c_char = ffi::mdbx_strerror(self.to_error_code()) as *const c_char;
 			str::from_utf8_unchecked(CStr::from_ptr(err).to_bytes())
 		};
 
@@ -176,11 +176,11 @@ impl fmt::Display for Error {
 
 impl StdError for Error {}
 
-pub fn mdb_result(err_code: c_int) -> Result<(), Error> {
+pub const fn mdb_result(err_code: c_int) -> Result<(), Error> {
 	if err_code == ffi::MDBX_SUCCESS {
 		Ok(())
 	} else {
-		Err(Error::from_err_code(err_code))
+		Err(Error::from_error_code(err_code))
 	}
 }
 
@@ -190,7 +190,7 @@ mod tests {
 
     #[test]
 	fn description() {
-		assert_eq!("Permission denied", Error::from_err_code(13).to_string());
+		assert_eq!("Permission denied", Error::from_error_code(13).to_string());
 		assert_eq!(
 			"MDBX_NOTFOUND: No matching key/data pair found",
 			Error::NotFound.to_string()
