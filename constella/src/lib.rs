@@ -15,6 +15,7 @@
 ))]
 compile_error!("Either lmdb or mdbx needs to be enabled, but not both");
 
+mod database;
 mod env;
 mod mdb;
 
@@ -25,6 +26,7 @@ pub use constella_types as types;
 pub use self::{
 	env::{env_closing_event, Env, EnvClosingEvent, EnvOpenOptions},
 	mdb::{error::Error as MdbError, flags},
+	database::Database
 };
 
 use constella_traits as traits;

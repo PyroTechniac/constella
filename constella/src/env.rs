@@ -1,7 +1,7 @@
 use crate::{
 	flags::Flags,
 	mdb::{error::mdb_result, ffi},
-	Error, Result,
+	Error, Result, Database
 };
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
@@ -64,7 +64,8 @@ fn get_file_fd(file: &File) -> std::os::unix::io::RawFd {
 	file.as_raw_fd()
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+#[allow(clippy::unsafe_derive_deserialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub struct EnvOpenOptions {
 	map_size: Option<usize>,
 	max_readers: Option<u32>,
@@ -189,6 +190,10 @@ pub fn env_closing_event<P: AsRef<Path>>(path: P) -> Option<EnvClosingEvent> {
 pub struct Env(Arc<EnvInner>);
 
 impl Env {
+	pub(crate) fn env_mut_ptr(&self) -> *mut ffi::MDB_env {
+		self.0.env
+	}
+
     pub fn copy_to_path<P: AsRef<Path>>(&self, path: P, option: bool) -> Result<File> {
         let file = File::create(&path)?;
         let fd = get_file_fd(&file);
