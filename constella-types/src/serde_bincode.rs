@@ -6,6 +6,7 @@ use std::{borrow::Cow, error::Error, marker::PhantomData};
 /// Describes a type that is [`Serialize`]/[`Deserialize`] and uses `bincode` to do so.
 ///
 /// It can borrow bytes from the original slice.
+#[doc(cfg(feature = "bincode"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Bincode<T>(PhantomData<T>);
 
