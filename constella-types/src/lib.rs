@@ -50,3 +50,26 @@ pub use self::serde_bincode::Bincode;
 
 #[cfg(feature = "json")]
 pub use self::serde_json::Json;
+
+use std::error::Error;
+
+/// Describes a slice of bytes `[u8]` that is totally
+/// borrowed and doesn't depends on any [memory alignment].
+///
+/// [memory alignment]: std::mem::align_of()
+pub type ByteSlice<'a> = UnalignedSlice<'a, u8>;
+
+/// A convenient struct made to ignore the type when decoding it.
+///
+/// It is appropriate to be used to count keys for example
+/// or to ensure that an entry exist for example.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct DecodeIgnore;
+
+impl constella_traits::BytesDecode<'_> for DecodeIgnore {
+	type Item = ();
+
+	fn bytes_decode(_: &[u8]) -> Result<Self::Item, Box<dyn Error + Send + Sync>> {
+		Ok(())
+	}
+}

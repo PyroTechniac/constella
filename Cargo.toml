@@ -1,2 +1,2 @@
 [workspace]
-members = ["constella-traits", "constella-types"]
+members = ["constella-traits", "constella-types", "constella"]
