@@ -89,30 +89,30 @@ impl Error {
 
 	#[must_use]
 	pub const fn to_error_code(self) -> c_int {
-        match self {
-            Self::KeyExist => ffi::MDB_KEYEXIST,
-            Self::NotFound => ffi::MDB_NOTFOUND,
-            Self::PageNotFound => ffi::MDB_PAGE_NOTFOUND,
-            Self::Corrupted => ffi::MDB_CORRUPTED,
-            Self::Panic => ffi::MDB_PANIC,
-            Self::VersionMismatch => ffi::MDB_VERSION_MISMATCH,
-            Self::Invalid => ffi::MDB_INVALID,
-            Self::MapFull => ffi::MDB_MAP_FULL,
-            Self::DbsFull => ffi::MDB_DBS_FULL,
-            Self::ReadersFull => ffi::MDB_READERS_FULL,
-            Self::TlsFull => ffi::MDB_TLS_FULL,
-            Self::TxnFull => ffi::MDB_TXN_FULL,
-            Self::CursorFull => ffi::MDB_CURSOR_FULL,
-            Self::PageFull => ffi::MDB_PAGE_FULL,
-            Self::MapResized => ffi::MDB_MAP_RESIZED,
-            Self::Incompatible => ffi::MDB_INCOMPATIBLE,
-            Self::BadRslot => ffi::MDB_BAD_RSLOT,
-            Self::BadTxn => ffi::MDB_BAD_TXN,
-            Self::BadValSize => ffi::MDB_BAD_VALSIZE,
-            Self::BadDbi => ffi::MDB_BAD_DBI,
-            Self::Other(err_code) => err_code,
-        }
-    }
+		match self {
+			Self::KeyExist => ffi::MDB_KEYEXIST,
+			Self::NotFound => ffi::MDB_NOTFOUND,
+			Self::PageNotFound => ffi::MDB_PAGE_NOTFOUND,
+			Self::Corrupted => ffi::MDB_CORRUPTED,
+			Self::Panic => ffi::MDB_PANIC,
+			Self::VersionMismatch => ffi::MDB_VERSION_MISMATCH,
+			Self::Invalid => ffi::MDB_INVALID,
+			Self::MapFull => ffi::MDB_MAP_FULL,
+			Self::DbsFull => ffi::MDB_DBS_FULL,
+			Self::ReadersFull => ffi::MDB_READERS_FULL,
+			Self::TlsFull => ffi::MDB_TLS_FULL,
+			Self::TxnFull => ffi::MDB_TXN_FULL,
+			Self::CursorFull => ffi::MDB_CURSOR_FULL,
+			Self::PageFull => ffi::MDB_PAGE_FULL,
+			Self::MapResized => ffi::MDB_MAP_RESIZED,
+			Self::Incompatible => ffi::MDB_INCOMPATIBLE,
+			Self::BadRslot => ffi::MDB_BAD_RSLOT,
+			Self::BadTxn => ffi::MDB_BAD_TXN,
+			Self::BadValSize => ffi::MDB_BAD_VALSIZE,
+			Self::BadDbi => ffi::MDB_BAD_DBI,
+			Self::Other(err_code) => err_code,
+		}
+	}
 }
 
 impl fmt::Display for Error {
@@ -138,14 +138,14 @@ pub const fn mdb_result(err_code: c_int) -> Result<(), Error> {
 
 #[cfg(test)]
 mod test {
-    use super::Error;
+	use super::Error;
 
-    #[test]
-    fn description() {
-        assert_eq!("Permission denied", Error::from_error_code(13).to_string());
-        assert_eq!(
-            "MDB_NOTFOUND: No matching key/data pair found",
-            Error::NotFound.to_string()
-        );
-    }
+	#[test]
+	fn description() {
+		assert_eq!("Permission denied", Error::from_error_code(13).to_string());
+		assert_eq!(
+			"MDB_NOTFOUND: No matching key/data pair found",
+			Error::NotFound.to_string()
+		);
+	}
 }

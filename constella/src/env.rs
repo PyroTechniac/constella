@@ -1,7 +1,7 @@
 use crate::{
 	flags::Flags,
 	mdb::{error::mdb_result, ffi},
-	Error, Result, Database
+	Database, Error, Result,
 };
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
@@ -194,26 +194,26 @@ impl Env {
 		self.0.env
 	}
 
-    pub fn copy_to_path<P: AsRef<Path>>(&self, path: P, option: bool) -> Result<File> {
-        let file = File::create(&path)?;
-        let fd = get_file_fd(&file);
+	pub fn copy_to_path<P: AsRef<Path>>(&self, path: P, option: bool) -> Result<File> {
+		let file = File::create(&path)?;
+		let fd = get_file_fd(&file);
 
-        unsafe {self.copy_to_fd(fd, option)?;}
+		unsafe {
+			self.copy_to_fd(fd, option)?;
+		}
 
-        let file = File::open(path)?;
+		let file = File::open(path)?;
 
-        Ok(file)
-    }
+		Ok(file)
+	}
 
-    pub unsafe fn copy_to_fd(&self, fd: ffi::mdb_filehandle_t, option: bool) -> Result<()> {
-        let flags = if option {
-            ffi::MDB_CP_COMPACT
-        } else {0};
+	pub unsafe fn copy_to_fd(&self, fd: ffi::mdb_filehandle_t, option: bool) -> Result<()> {
+		let flags = if option { ffi::MDB_CP_COMPACT } else { 0 };
 
-        mdb_result(ffi::mdb_env_copy2fd(self.0.env, fd, flags))?;
+		mdb_result(ffi::mdb_env_copy2fd(self.0.env, fd, flags))?;
 
-        Ok(())
-    }
+		Ok(())
+	}
 
 	#[cfg(feature = "lmdb")]
 	pub fn force_sync(&self) -> Result<()> {

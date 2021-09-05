@@ -188,7 +188,7 @@ pub const fn mdb_result(err_code: c_int) -> Result<(), Error> {
 mod tests {
 	use super::Error;
 
-    #[test]
+	#[test]
 	fn description() {
 		assert_eq!("Permission denied", Error::from_error_code(13).to_string());
 		assert_eq!(

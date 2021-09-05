@@ -110,8 +110,7 @@ impl<'txn> RwCursor<'txn> {
 	}
 
 	pub fn put_current(&mut self, key: &[u8], data: &[u8]) -> Result<bool> {
-		let (mut key_val, mut data_val) =
-			unsafe { (crate::into_val(key), crate::into_val(data)) };
+		let (mut key_val, mut data_val) = unsafe { (crate::into_val(key), crate::into_val(data)) };
 
 		let result = unsafe {
 			mdb_result(ffi::mdb_cursor_put(
@@ -129,9 +128,32 @@ impl<'txn> RwCursor<'txn> {
 		}
 	}
 
-    pub fn append(&mut self, key: &[u8], data: &[u8]) -> Result<()> {
-        let (mut key_val, mut data_val) = unsafe {
-            (crate::into_val(key), crate::into_val(data))
-        };
-    }
+	pub fn append(&mut self, key: &[u8], data: &[u8]) -> Result<()> {
+		let (mut key_val, mut data_val) = unsafe { (crate::into_val(key), crate::into_val(data)) };
+
+		let result = unsafe {
+			mdb_result(ffi::mdb_cursor_put(
+				self.cursor.cursor,
+				&mut key_val,
+				&mut data_val,
+				ffi::MDB_APPEND,
+			))
+		};
+
+		result.map_err(Into::into)
+	}
+}
+
+impl<'txn> Deref for RwCursor<'txn> {
+	type Target = RoCursor<'txn>;
+
+	fn deref(&self) -> &Self::Target {
+		&self.cursor
+	}
+}
+
+impl DerefMut for RwCursor<'_> {
+	fn deref_mut(&mut self) -> &mut Self::Target {
+		&mut self.cursor
+	}
 }
