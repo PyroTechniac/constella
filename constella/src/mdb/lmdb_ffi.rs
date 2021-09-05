@@ -1,5 +1,7 @@
 use lmdb_sys as ffi;
 
+pub(crate) use ffi::MDB_cursor_op as MDB_cursor_op;
+
 pub use ffi::MDB_cursor as MDB_cursor;
 pub use ffi::MDB_dbi as MDB_dbi;
 pub use ffi::MDB_env as MDB_env;

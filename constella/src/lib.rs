@@ -15,18 +15,28 @@
 ))]
 compile_error!("Either lmdb or mdbx needs to be enabled, but not both");
 
+mod cursor;
 mod database;
 mod env;
+mod lazy_decode;
 mod mdb;
+mod txn;
 
 pub use bytemuck;
 pub use byteorder;
 pub use constella_types as types;
 
 pub use self::{
+	cursor::{RoCursor, RwCursor},
+	database::Database,
 	env::{env_closing_event, Env, EnvClosingEvent, EnvOpenOptions},
-	mdb::{error::Error as MdbError, flags},
-	database::Database
+	lazy_decode::{Lazy, LazyDecode},
+	mdb::{
+		error::Error as MdbError,
+		ffi::{from_val, into_val},
+		flags,
+	},
+	txn::{RoTxn, RwTxn},
 };
 
 use constella_traits as traits;

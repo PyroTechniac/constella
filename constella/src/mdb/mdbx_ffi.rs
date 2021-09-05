@@ -1,9 +1,11 @@
 use mdbx_sys as ffi;
 
+pub(crate) use ffi::MDBX_cursor_op as MDB_cursor_op;
+
+pub use ffi::mdbx_filehandle_t as mdb_filehandle_t;
 pub use ffi::MDBX_cursor as MDB_cursor;
 pub use ffi::MDBX_dbi as MDB_dbi;
 pub use ffi::MDBX_env as MDB_env;
-pub use ffi::mdbx_filehandle_t as mdb_filehandle_t;
 pub use ffi::MDBX_txn as MDB_txn;
 
 pub use ffi::MDBX_APPEND as MDB_APPEND;
@@ -38,28 +40,28 @@ pub use ffi::mdbx_cursor_get as mdb_cursor_get;
 pub use ffi::mdbx_cursor_open as mdb_cursor_open;
 pub use ffi::mdbx_cursor_put as mdb_cursor_put;
 
-pub use ffi::mdbx_env_stat as mdb_env_stat;
 pub use ffi::mdbx_dbi_stat as mdb_stat;
+pub use ffi::mdbx_env_stat as mdb_env_stat;
 pub use ffi::MDBX_stat as MDB_Stat;
 
 pub mod cursor_op {
-    use super::ffi::MDBX_cursor_op;
+	use super::ffi::MDBX_cursor_op;
 
-    pub const MDB_FIRST: MDBX_cursor_op = MDBX_cursor_op::MDBX_FIRST;
-    pub const MDB_LAST: MDBX_cursor_op = MDBX_cursor_op::MDBX_LAST;
-    pub const MDB_SET_RANGE: MDBX_cursor_op = MDBX_cursor_op::MDBX_SET_RANGE;
-    pub const MDB_PREV: MDBX_cursor_op = MDBX_cursor_op::MDBX_PREV;
-    pub const MDB_NEXT: MDBX_cursor_op = MDBX_cursor_op::MDBX_NEXT;
-    pub const MDB_GET_CURRENT: MDBX_cursor_op = MDBX_cursor_op::MDBX_GET_CURRENT;
+	pub const MDB_FIRST: MDBX_cursor_op = MDBX_cursor_op::MDBX_FIRST;
+	pub const MDB_LAST: MDBX_cursor_op = MDBX_cursor_op::MDBX_LAST;
+	pub const MDB_SET_RANGE: MDBX_cursor_op = MDBX_cursor_op::MDBX_SET_RANGE;
+	pub const MDB_PREV: MDBX_cursor_op = MDBX_cursor_op::MDBX_PREV;
+	pub const MDB_NEXT: MDBX_cursor_op = MDBX_cursor_op::MDBX_NEXT;
+	pub const MDB_GET_CURRENT: MDBX_cursor_op = MDBX_cursor_op::MDBX_GET_CURRENT;
 }
 
 pub const unsafe fn into_val(value: &[u8]) -> ffi::MDBX_val {
-    ffi::MDBX_val {
-        iov_base: value.as_ptr() as *mut libc::c_void,
-        iov_len: value.len(),
-    }
+	ffi::MDBX_val {
+		iov_base: value.as_ptr() as *mut libc::c_void,
+		iov_len: value.len(),
+	}
 }
 
 pub unsafe fn from_val<'a>(value: ffi::MDBX_val) -> &'a [u8] {
-    std::slice::from_raw_parts(value.iov_base as *const u8, value.iov_len)
+	std::slice::from_raw_parts(value.iov_base as *const u8, value.iov_len)
 }
