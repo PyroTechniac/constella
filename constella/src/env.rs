@@ -1,7 +1,7 @@
 use crate::{
 	flags::Flags,
 	mdb::{error::mdb_result, ffi},
-	Database, Error, Result,
+	Database, Error, Result, RoTxn, RwTxn,
 };
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
@@ -192,6 +192,146 @@ pub struct Env(Arc<EnvInner>);
 impl Env {
 	pub(crate) fn env_mut_ptr(&self) -> *mut ffi::MDB_env {
 		self.0.env
+	}
+
+	pub fn open_database<K, V>(&self, name: Option<&str>) -> Result<Option<Database<K, V>>>
+	where
+		K: 'static,
+		V: 'static,
+	{
+		let types = (TypeId::of::<K>(), TypeId::of::<V>());
+		Ok(self
+			.raw_open_database(name, types)?
+			.map(|db| Database::new(self.env_mut_ptr() as _, db)))
+	}
+
+	fn raw_open_database(
+		&self,
+		name: Option<&str>,
+		types: (TypeId, TypeId),
+	) -> Result<Option<u32>> {
+		let rtxn = self.read_txn()?;
+
+		let mut dbi = 0;
+		let name = name.map(|n| CString::new(n).unwrap());
+		let name_ptr = match name {
+			Some(ref name) => name.as_bytes_with_nul().as_ptr().cast(),
+			None => ptr::null(),
+		};
+
+		let mut lock = self.0.dbi_open_mutex.lock().unwrap();
+
+		let result = unsafe { mdb_result(ffi::mdb_dbi_open(rtxn.txn, name_ptr, 0, &mut dbi)) };
+
+		drop(name);
+
+		match result {
+			Ok(()) => {
+				rtxn.commit()?;
+
+				let old_types = lock.entry(dbi).or_insert(types);
+
+				if *old_types == types {
+					Ok(Some(dbi))
+				} else {
+					Err(Error::InvalidDatabaseTyping)
+				}
+			}
+			Err(e) if e.not_found() => Ok(None),
+			Err(e) => Err(e.into()),
+		}
+	}
+
+	pub fn create_database<K, V>(&self, name: Option<&str>) -> Result<Database<K, V>>
+	where
+		K: 'static,
+		V: 'static,
+	{
+		let mut parent_wtxn = self.write_txn()?;
+		let db = self.create_database_with_txn(name, &mut parent_wtxn)?;
+		parent_wtxn.commit()?;
+		Ok(db)
+	}
+
+	pub fn create_database_with_txn<K, V>(
+		&self,
+		name: Option<&str>,
+		parent_wtxn: &mut RwTxn,
+	) -> Result<Database<K, V>>
+	where
+		K: 'static,
+		V: 'static,
+	{
+		let types = (TypeId::of::<K>(), TypeId::of::<V>());
+		self.raw_create_database(name, types, parent_wtxn)
+			.map(|db| Database::new(self.env_mut_ptr() as _, db))
+	}
+
+	fn raw_create_database(
+		&self,
+		name: Option<&str>,
+		types: (TypeId, TypeId),
+		parent_wtxn: &mut RwTxn,
+	) -> Result<u32> {
+		let wtxn = self.nested_write_txn(parent_wtxn)?;
+
+		let mut dbi = 0;
+		let name = name.map(|n| CString::new(n).unwrap());
+		let name_ptr = match name {
+			Some(ref name) => name.as_bytes_with_nul().as_ptr().cast(),
+			None => ptr::null(),
+		};
+
+		let mut lock = self.0.dbi_open_mutex.lock().unwrap();
+
+		let result = unsafe {
+			mdb_result(ffi::mdb_dbi_open(
+				wtxn.txn.txn,
+				name_ptr,
+				ffi::MDB_CREATE,
+				&mut dbi,
+			))
+		};
+
+		drop(name);
+
+		match result {
+			Ok(()) => {
+				wtxn.commit()?;
+
+				let old_types = lock.entry(dbi).or_insert(types);
+
+				if *old_types == types {
+					Ok(dbi)
+				} else {
+					Err(Error::InvalidDatabaseTyping)
+				}
+			}
+			Err(e) => Err(e.into()),
+		}
+	}
+
+	pub fn write_txn(&self) -> Result<RwTxn> {
+		RwTxn::new(self)
+	}
+
+	pub fn typed_write_txn<T>(&self) -> Result<RwTxn<T>> {
+		RwTxn::new(self)
+	}
+
+	pub fn nested_write_txn<'e, 'p: 'e, T>(
+		&'e self,
+		parent: &'p mut RwTxn<T>,
+	) -> Result<RwTxn<'e, 'p, T>> {
+		RwTxn::nested(self, parent)
+	}
+
+	pub fn read_txn(&self) -> Result<RoTxn> {
+		RoTxn::new(self)
+	}
+
+	pub fn typed_read_txn<T>(&self) -> Result<RoTxn<T>> {
+		RoTxn::new(self)
 	}
 
 	pub fn copy_to_path<P: AsRef<Path>>(&self, path: P, option: bool) -> Result<File> {

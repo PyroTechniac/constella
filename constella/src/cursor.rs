@@ -51,6 +51,35 @@ impl<'txn> RoCursor<'txn> {
 		self.raw_move(ffi::cursor_op::MDB_NEXT)
 	}
 
+	#[allow(clippy::shadow_unrelated)]
+	pub fn move_on_key_greater_than_or_equal_to(&mut self, key: &[u8]) -> MoveResult {
+		let mut key_val = unsafe { crate::into_val(key) };
+		let mut data_val = mem::MaybeUninit::uninit();
+
+		let result = unsafe {
+			mdb_result(ffi::mdb_cursor_get(
+				self.cursor,
+				&mut key_val,
+				data_val.as_mut_ptr(),
+				ffi::cursor_op::MDB_SET_RANGE,
+			))
+		};
+
+		match result {
+			Ok(()) => {
+				let (key, data) = unsafe {
+					(
+						crate::from_val(key_val),
+						crate::from_val(data_val.assume_init()),
+					)
+				};
+				Ok(Some((key, data)))
+			}
+			Err(e) if e.not_found() => Ok(None),
+			Err(e) => Err(e.into()),
+		}
+	}
+
 	fn raw_move(&mut self, cursor: ffi::MDB_cursor_op) -> MoveResult {
 		let mut key_val = mem::MaybeUninit::uninit();
 		let mut data_val = mem::MaybeUninit::uninit();

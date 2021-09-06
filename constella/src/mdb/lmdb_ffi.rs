@@ -1,3 +1,4 @@
+#![allow(clippy::redundant_pub_crate)]
 use lmdb_sys as ffi;
 
 pub(crate) use ffi::MDB_cursor_op;
@@ -54,6 +55,7 @@ pub mod cursor_op {
 	pub const MDB_GET_CURRENT: MDB_cursor_op = ffi::MDB_GET_CURRENT;
 }
 
+#[must_use]
 pub const unsafe fn into_val(value: &[u8]) -> ffi::MDB_val {
 	ffi::MDB_val {
 		mv_data: value.as_ptr() as *mut libc::c_void,
@@ -61,6 +63,7 @@ pub const unsafe fn into_val(value: &[u8]) -> ffi::MDB_val {
 	}
 }
 
+#[must_use]
 pub unsafe fn from_val<'a>(value: ffi::MDB_val) -> &'a [u8] {
 	std::slice::from_raw_parts(value.mv_data as *const u8, value.mv_size)
 }

@@ -1,3 +1,4 @@
+#![allow(clippy::redundant_pub_crate)]
 use mdbx_sys as ffi;
 
 pub(crate) use ffi::MDBX_cursor_op as MDB_cursor_op;
@@ -55,6 +56,7 @@ pub mod cursor_op {
 	pub const MDB_GET_CURRENT: MDBX_cursor_op = MDBX_cursor_op::MDBX_GET_CURRENT;
 }
 
+#[must_use]
 pub const unsafe fn into_val(value: &[u8]) -> ffi::MDBX_val {
 	ffi::MDBX_val {
 		iov_base: value.as_ptr() as *mut libc::c_void,
@@ -62,6 +64,7 @@ pub const unsafe fn into_val(value: &[u8]) -> ffi::MDBX_val {
 	}
 }
 
+#[must_use]
 pub unsafe fn from_val<'a>(value: ffi::MDBX_val) -> &'a [u8] {
 	std::slice::from_raw_parts(value.iov_base as *const u8, value.iov_len)
 }
