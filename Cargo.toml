@@ -1,2 +1,9 @@
-[workspace]
-members = ["constella-traits", "constella-types", "constella"]
+[package]
+name = "constella"
+version = "0.1.0"
+edition = "2018"
+authors = ["Gryffon Bellish <owenbellish@gmail.com>"]
+
+[dependencies]
+structsy = "0.3"
+structsy-derive = "0.3"
