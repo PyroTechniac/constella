@@ -6,4 +6,3 @@ authors = ["Gryffon Bellish <owenbellish@gmail.com>"]
 
 [dependencies]
 structsy = "0.3"
-structsy-derive = "0.3"

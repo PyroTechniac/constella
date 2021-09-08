@@ -32,6 +32,8 @@ impl_transformer_primitive! {
 	isize;
 	i128;
 	bool;
+	f32;
+	f64;
 }
 
 impl Transformer for String {
