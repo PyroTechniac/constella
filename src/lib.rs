@@ -4,6 +4,7 @@
 
 use std::{
 	cmp::Ordering,
+	fmt::{Debug, Formatter, Result as FmtResult},
 	io::{Read, Write},
 	marker::PhantomData,
 };
@@ -19,7 +20,6 @@ pub trait Transformer {
 	fn revert(value: &Self::DataType) -> Self;
 }
 
-#[derive(Debug)]
 pub struct DataHolder<V, T> {
 	inner: V,
 	_marker: PhantomData<T>,
@@ -50,12 +50,13 @@ where
 {
 	fn read(read: &mut dyn Read) -> SRes<Self>
 	where
-			Self: Sized {
+		Self: Sized,
+	{
 		let inner = V::read(read)?;
 
 		Ok(Self {
 			inner,
-			_marker: PhantomData
+			_marker: PhantomData,
 		})
 	}
 
@@ -75,6 +76,18 @@ where
 			inner,
 			_marker: PhantomData,
 		}
+	}
+}
+
+impl<V, T> Debug for DataHolder<V, T>
+where
+	V: Debug,
+{
+	fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+		f.debug_struct("DataHolder")
+			.field("inner", &self.inner)
+			.field("_marker", &"_")
+			.finish()
 	}
 }
 
