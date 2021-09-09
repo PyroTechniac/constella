@@ -1,6 +1,9 @@
-use structsy::PersistentEmbedded;
-
 use super::Transformer;
+use structsy::PersistentEmbedded;
+use twilight_model::id::{
+	ApplicationId, AttachmentId, AuditLogEntryId, ChannelId, CommandId, EmojiId, GenericId,
+	GuildId, IntegrationId, InteractionId, MessageId, RoleId, StageId, UserId, WebhookId,
+};
 
 macro_rules! impl_transformer_primitive {
     ($($args:ty;)*) => {
@@ -20,6 +23,24 @@ macro_rules! impl_transformer_primitive {
     }
 }
 
+macro_rules! impl_transformer_id {
+	($($args:tt;)*) => {
+		$(
+			impl Transformer for $args {
+				type DataType = u64;
+
+				fn transform(&self) -> Self::DataType {
+					self.0
+				}
+
+				fn revert(value: &Self::DataType) -> Self {
+					Self(*value)
+				}
+			}
+		)*
+	}
+}
+
 impl_transformer_primitive! {
 	u8;
 	u16;
@@ -36,15 +57,33 @@ impl_transformer_primitive! {
 	f64;
 }
 
+impl_transformer_id! {
+	ApplicationId;
+	AttachmentId;
+	AuditLogEntryId;
+	ChannelId;
+	CommandId;
+	EmojiId;
+	GenericId;
+	GuildId;
+	IntegrationId;
+	InteractionId;
+	MessageId;
+	RoleId;
+	StageId;
+	UserId;
+	WebhookId;
+}
+
 impl Transformer for String {
-	type DataType = Vec<u8>;
+	type DataType = Self;
 
 	fn transform(&self) -> Self::DataType {
-		self.clone().into_bytes()
+		self.clone()
 	}
 
 	fn revert(value: &Self::DataType) -> Self {
-		unsafe { Self::from_utf8_unchecked(value.clone()) }
+		value.clone()
 	}
 }
 
