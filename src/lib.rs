@@ -8,7 +8,7 @@ use std::{
 	io::{Read, Write},
 	marker::PhantomData,
 };
-use structsy::{Persistent, PersistentEmbedded, Ref, SRes, internal::IndexableValue};
+use structsy::{PersistentEmbedded,SRes};
 
 mod implementors;
 
@@ -40,20 +40,6 @@ where
 
 	pub fn into_value(&self) -> T {
 		T::revert(&self.inner)
-	}
-}
-
-impl<V, T> IndexableValue for DataHolder<V, T>
-where
-	V: IndexableValue,
-	T: Transformer<DataType = V>,
-{
-	fn puts<P: Persistent>(&self, tx: &mut dyn structsy::Sytx, name: &str, id: &Ref<P>) -> SRes<()> {
-		self.inner.puts(tx, name, id)
-	}
-
-	fn removes<P: Persistent>(&self, tx: &mut dyn structsy::Sytx, name: &str, id: &Ref<P>) -> SRes<()> {
-		self.inner.removes(tx, name, id)
 	}
 }
 
