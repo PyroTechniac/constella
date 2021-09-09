@@ -1,3 +1,4 @@
+#![feature(doc_cfg)]
 #![deny(clippy::all)]
 #![warn(clippy::pedantic, clippy::nursery, clippy::suspicious)]
 
@@ -11,7 +12,7 @@ use structsy::{PersistentEmbedded, SRes};
 mod implementors;
 
 pub trait Transformer {
-	type DataType;
+	type DataType: PersistentEmbedded;
 
 	fn transform(&self) -> Self::DataType;
 

@@ -1,3 +1,5 @@
+use structsy::PersistentEmbedded;
+
 use super::Transformer;
 
 macro_rules! impl_transformer_primitive {
@@ -23,13 +25,11 @@ impl_transformer_primitive! {
 	u16;
 	u32;
 	u64;
-	usize;
 	u128;
 	i8;
 	i16;
 	i32;
 	i64;
-	isize;
 	i128;
 	bool;
 	f32;
@@ -48,7 +48,37 @@ impl Transformer for String {
 	}
 }
 
-impl<Dt, T: Transformer<DataType = Dt>> Transformer for Option<T> {
+#[cfg(target_pointer_width = "64")]
+#[doc(cfg(target_pointer_width = "64"))]
+impl Transformer for usize {
+	type DataType = u64;
+
+	fn transform(&self) -> Self::DataType {
+		*self as u64
+	}
+
+	#[allow(clippy::cast_possible_truncation)]
+	fn revert(value: &Self::DataType) -> Self {
+		*value as Self
+	}
+}
+
+#[cfg(target_pointer_width = "64")]
+#[doc(cfg(target_pointer_width = "64"))]
+impl Transformer for isize {
+	type DataType = i64;
+
+	fn transform(&self) -> Self::DataType {
+		*self as i64
+	}
+
+	#[allow(clippy::cast_possible_truncation)]
+	fn revert(value: &Self::DataType) -> Self {
+		*value as Self
+	}
+}
+
+impl<Dt: PersistentEmbedded, T: Transformer<DataType = Dt>> Transformer for Option<T> {
 	type DataType = Option<Dt>;
 
 	fn transform(&self) -> Self::DataType {
